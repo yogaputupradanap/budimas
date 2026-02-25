@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "ptbudimas",
+  "private_key_id": "29b803f1d7353fa6cb63f72cfb27cec15c965dff",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCusPHcnQFNuI0Q\nQ4vMSbU/ERuhZAmqkg/sgWnogIQt47kmNjL2gMzVWQ7OuNUuYF5LTc4ECWcnOoyu\nXQj0bTohXNHz9eozxwUS6n0TL1DIzbz2g0CxKLuSHlis3Q4d1N7eFCHGmIycLbYO\nqCOPjpflmZgVEC9FW3LeHc5AiPLWu6srHI6kQlqnAwZKks5i9JnEhcSH6lPA0y2J\nwGyrJzTBeSRflFqSfaNwRgPQDVtoboDewze9BIHIfBf4nMg1ZL2lv0lj6mjSH5v4\nSxjxznfkFY9Yt/vI7kAzNpCr/eroVrsJXcqEoR9Gmt8OSKl/mivtJxhGbFZXC37w\nFdCQyASRAgMBAAECggEAASUUuLLotscuWXxv1ptnDi5BBZo/u/fwFcc1V/o7o4da\nB8eUJuxqKz3FrJImh4LHK2wrnPgozmeCU4Q1klCC8IQItjYW3lcAEAMsZatKNr6u\nbdknW+Hd9NOxFhTuykBCY6czH3eReFaOWmM8tGylTzJl/kFYZfZ29sCwQNkE6mZW\nr7kYibsHoxMpGz3vs3eG1gcV6YA74V/U+G+6UZXALxNpIBda/TqNif4o02tjHFS6\npsYJTe5ED+K4kL13l3XtVyULcXpTlvqtL5t9/+JbEJfrwZPdlUJB10snEc2z6a5C\njsGsCS/H3jdm7cuhO+NzAXMdq92ei5Y9NtU4IqzXAQKBgQDVIFbkjAPtDC2jR/+O\nAXssJAa4AMLRbjdUvGs6dINkxwnsxmrz0/o+OnG1x71IAw828z57irj0NC+5nMl2\nebGjh47DggcVLE1RHcEy4JicSlquhRL2XJdJPN6pMUTmE5Htt2765pIOT+YFWIIe\nR2bTAkFgaGuVy3tjrHTBEHkr4QKBgQDR1UIU48BxtvfZYeqbCWwifkVEzWZ2VltE\n0uCElC1WfTWUSByJ3EpQUlItgEnMoo/ga0HulOXupNGc9199SYvhv8kOqRprmu8a\nG2arIfxewpE+tEelFpranrqheHlpVWkq44c5M3oF8El57Xhx4Hklt90A5K8lv9hY\nnRM4sOZusQKBgQCaLI/POx5n78Rf9uh+oMGqt9EIcLx95j4ulTL4kWqvj3C1kP+z\nrSe8tmiluH1Lx7LM7H/JvRt4xPu1SR9QDk6b3qc+9SQMhATWZjDpjiG4Be29i9Sg\n1XA3ccodGOAflA6fqW+mHv+PTOs3+MQABWTzxhDnHgKd1RpIi2vWcgVF4QKBgATY\nIIts6p91culg2lKz9/wf4CeDem8W9Up0d9x3s0hA4cDHnWkNXeXW0LDeOlXwFtQ+\nhaolY92Ljo9KIrk4vnL6w4CEJOkBDa4Tnd4rjbD+Wu4QqWrFR9PuQC7EIkFtSF1G\nHXQTnSiP8JJRCivO290kDoUbwnNjp3H8RlpTsy4xAoGALvGf11J/DQcGwYdyOr2v\nEGahreagzlq059hr2VILloRQ/dUBRMkvtA17fSD/flO4GOUhEJdSy7jrG0SF0c47\nC7F5Y2dcdZNLKiOcdatDlk9qRrUOAYfOb1VqE2FdwjeW5qxOs2RKcq2ASZqUR2Xf\nXJDKukYrvu90FSj9y83moGU=\n-----END PRIVATE KEY-----\n",
+  "client_email": "budimasdoc@ptbudimas.iam.gserviceaccount.com",
+  "client_id": "104937623940679024935",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/budimasdoc%40ptbudimas.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

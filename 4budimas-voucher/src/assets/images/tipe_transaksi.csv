@@ -1,0 +1,11 @@
+id,nama,deskripsi
+1,Penjualan,Transaksi penjualan barang kepada pelanggan
+2,Pembelian,Transaksi pembelian barang dari pemasok
+3,Retur Penjualan,Transaksi pengembalian barang dari pelanggan
+4,Retur Pembelian,Transaksi pengembalian barang kepada pemasok
+"5,Biaya Operasional,""Biaya-biaya yang dikeluarkan untuk operasional perusahaan, seperti gaji, sewa, listrik, dll."""
+6,Penerimaan Piutang,Transaksi penerimaan pembayaran dari pelanggan atas penjualan kredit
+7,Pembayaran Hutang,Transaksi pembayaran kepada pemasok atas pembelian kredit
+"8,Penyesuaian Persediaan,""Transaksi penyesuaian nilai persediaan akibat kerusakan, kehilangan, dll."""
+9,Pembayaran Gaji,Transaksi pembayaran gaji kepada karyawan
+"10,Penerimaan Pendapatan Lain,""Transaksi penerimaan pendapatan selain dari penjualan, seperti bunga bank, dll."""

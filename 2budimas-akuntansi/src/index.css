@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    .message-clip {
+        -webkit-clip-path: polygon(59% 28%, 100% 29%, 100% 100%, 0 100%, 0 28%, 30% 28%, 32% 0);
+    }
+
+    .slide-container {
+        @apply tw-w-full tw-flex tw-flex-wrap lg:tw-justify-start tw-gap-4 tw-rounded-2xl tw-pr-0 md:tw-pr-4
+    }
+
+    .table-page-button {
+        @apply tw-bg-blue-500 disabled:tw-bg-gray-500 hover:tw-bg-gray-500 hover:tw-text-white tw-transition-all tw-duration-300 tw-ease-in-out tw-px-4 tw-py-3 tw-border-slate-400 tw-border tw-text-base tw-text-white tw-flex tw-justify-center tw-items-center tw-rounded-[4px]
+    }
+
+    .filter-table-input {
+        @apply tw-rounded-md tw-px-3 tw-py-2 tw-border tw-border-slate-400 tw-outline-none tw-text-sm focus:tw-border-slate-600 tw-w-full placeholder:tw-text-lg placeholder:tw-italic placeholder:tw-font-thin focus:tw-outline-4 focus:tw-outline-sky-400/50
+    }
+
+    .cell-table {
+        @apply tw-pl-0 md:tw-pl-4 tw-w-52 md:tw-w-auto
+    }
+
+    .form-grid-card {
+        @apply tw-w-full tw-px-3 tw-grid tw-grid-cols-1 md:tw-grid-cols-2 lg:tw-grid-cols-3 xl:tw-grid-cols-4 tw-gap-4
+    }
+
+
+    .form-grid-card-6-col {
+        @apply tw-w-full tw-px-3 tw-grid tw-grid-cols-1 md:tw-grid-cols-2 lg:tw-grid-cols-3 xl:tw-grid-cols-6 tw-gap-4
+    }
+
+    .form-grid-card-5-col {
+        @apply tw-w-full tw-px-3 tw-grid tw-grid-cols-1 md:tw-grid-cols-2 lg:tw-grid-cols-3 xl:tw-grid-cols-5 tw-gap-4
+    }
+
+    .form-grid-card-4-col {
+        @apply tw-w-full tw-px-3 tw-grid tw-grid-cols-1 md:tw-grid-cols-2 lg:tw-grid-cols-3 xl:tw-grid-cols-4 tw-gap-4
+    }
+
+    .form-grid-card-3-col {
+        @apply tw-w-full tw-px-3 tw-grid tw-grid-cols-1 md:tw-grid-cols-2 lg:tw-grid-cols-3 tw-gap-4
+    }
+
+    .form-grid-card-2-col {
+        @apply tw-w-full tw-px-3 tw-grid tw-grid-cols-1 md:tw-grid-cols-2 tw-gap-4
+    }
+
+    .form-grid-card-1-col {
+        @apply tw-w-full tw-px-3 tw-grid tw-grid-cols-1 tw-gap-4
+    }
+
+    .form-grid-card-container-2-col {
+        @apply tw-w-full tw-grid tw-grid-cols-1 lg:tw-grid-cols-2 tw-mb-8 tw-gap-2
+    }
+
+    .form-grid-card-container-4-col {
+        @apply tw-w-full tw-grid tw-grid-cols-1 lg:tw-grid-cols-4 tw-justify-start tw-gap-6
+    }
+
+    .table-cell-small {
+        @apply tw-min-w-32 xl:tw-min-w-fit xl:tw-max-w-20 tw-w-auto tw-flex tw-justify-start tw-pr-4 tw-break-words
+    }
+
+    .table-cell-medium {
+        @apply tw-min-w-44 xl:tw-min-w-fit xl:tw-max-w-24 tw-w-auto tw-flex tw-justify-start tw-pr-4 tw-break-words
+    }
+
+    .table-cell-lg {
+        @apply tw-min-w-60 xl:tw-min-w-fit xl:tw-max-w-40 tw-w-auto tw-flex tw-justify-start tw-pr-4 tw-break-words
+    }
+
+    .skeleton {
+        @apply tw-w-full tw-h-[34px]
+    }
+
+}

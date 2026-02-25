@@ -1,0 +1,15 @@
+default:
+  image: google/cloud-sdk:alpine
+  before_script:
+    - gcloud auth activate-service-account --key-file "$SERVICE_ACCOUNT"
+    - gcloud config set project ptbudimas
+
+build:
+  stage: build
+  script:
+    - gcloud builds submit --config=cloudbuild.yaml --substitutions=_LOCATION="asia-southeast2",_REPOSITORY="stoktransferdeploy",_IMAGE="stoktransferdeploy"
+
+deploy:
+  stage: deploy
+  script:
+    - gcloud run deploy budimas-stock-transfer --image asia-southeast2-docker.pkg.dev/ptbudimas/stoktransferdeploy/stoktransferdeploy --region=asia-southeast2 --platform managed --allow-unauthenticated

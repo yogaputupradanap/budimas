@@ -1,0 +1,15 @@
+default:
+  image: google/cloud-sdk:alpine
+  before_script:
+    - gcloud auth activate-service-account --key-file "$SERVICE_ACCOUNT"
+    - gcloud config set project ptbudimas
+
+build:
+  stage: build
+  script:
+    - gcloud builds submit --config=cloudbuild.yaml --substitutions=_LOCATION="asia-southeast2",_REPOSITORY="fe-akuntansi",_IMAGE="fe-akuntansi"
+
+deploy:
+  stage: deploy
+  script:
+    - gcloud run deploy budimas-akuntansi --image asia-southeast2-docker.pkg.dev/ptbudimas/fe-akuntansi/fe-akuntansi --region=asia-southeast2 --platform managed --allow-unauthenticated

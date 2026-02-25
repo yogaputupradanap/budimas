@@ -12,3 +12,13 @@ untuk menjalankan python
 8. kedua nya untuk install node modulnya
 9. untuk source selain python pakai npm start serve kecuali laravel bisa langunsg pakai link di laragon
 10. semua di jalankan lewat terminal selain source laravel
+
+Untuk Download salah satu foldernya
+# 1. Tambahkan remote
+git remote add origin https://github.com/yogaputupradanap/budimas.git
+
+# 2. Aktifkan fitur sparse-checkout
+git sparse-checkout set "NAMA_FOLDER_YANG_MAU_DIAMBIL"
+
+# 3. Tarik datanya
+git pull origin main

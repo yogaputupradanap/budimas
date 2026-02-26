@@ -1,0 +1,20 @@
+version: '3'
+services:
+  app:
+    build:
+      context: ./
+    volumes:
+      - .:/var/www/html
+    ports:
+      - "8080:8080"
+    environment:
+      - APP_ENV=production
+      - APP_URL=https://budimas-swgriortza-et.a.run.app/
+      - DB_CONNECTION=mysql
+      - DB_HOST=127.0.0.1
+      - DB_PORT=3306
+      - DB_DATABASE=sarinah-lav
+      - DB_USERNAME=root
+      - DB_PASSWORD=horusharusheroes
+      - DB_SOCKET=/cloudsql/tamu-337111:asia-southeast2:sarinah
+

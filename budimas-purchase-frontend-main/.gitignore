@@ -1,0 +1,23 @@
+# # Dependencies
+# node_modules/
+# vendor/
+
+# # Laravel specific
+# /public/hot
+# /public/storage
+# /storage/*.key
+
+# # Environment files
+# .env
+# .env.backup
+
+# # PHPUnit result cache
+# .phpunit.result.cache
+
+# # Homestead files
+# Homestead.json
+# Homestead.yaml
+
+# # Logs
+# npm-debug.log*
+# yarn-error.log*

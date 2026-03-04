@@ -24,7 +24,7 @@ class PaginateV2():
         self.__setGroupBy()
 
     def __validateSelectQuery(self, query):
-        disallowed_keywords = ['UPDATE', 'DELETE', 'INSERT', 'DROP', 'ALTER']
+        disallowed_keywords = ['UPDATE', 'DELETE', 'INSERT', 'DROP', 'ALTER', 'IS', 'NULL']
         query_upper = query.upper()
 
         for keyword in disallowed_keywords:
@@ -83,7 +83,7 @@ class PaginateV2():
         if clause :
             self.__validateSelectQuery(clause)
 
-            dict_clause = ast.literal_eval(clause)
+            dict_clause = json.loads(clause)
             self.clause = dict_clause
 
         return self

@@ -25,7 +25,7 @@ def _1031(): return UserS().token()
 
 @auth.route('/api/auth/sales/login', methods=["POST"])
 def _11(): 
-    print("LOGIN ROUTE HIT")
+    print("LOGIN ROUTE SALES HIT")
     return Sales().get_token_by_credential()
 
 @auth.route('/api/auth/distribusi/login', methods=["POST"])
@@ -43,10 +43,12 @@ def _41(): return Voucher().getMasterVoucherUser()
 def _51(): return Promo().getPromoUser()
 
 @auth.route('/api/auth/dms/login', methods=["POST"])
-def _701(): return Auth().login()
+def _701(): return DMS().getDmsUser()
 
 @auth.route('/api/auth/login', methods=["POST"])
-def _700(): return loginakuntansi().login()
+def _700(): 
+     print("LOGIN ROUTE HIT")
+     return loginakuntansi().login()
 
 @auth.route('/api/auth/pajak-login', methods=["POST"])
 def _702():   

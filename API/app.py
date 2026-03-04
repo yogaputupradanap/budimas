@@ -20,6 +20,8 @@ from apps.routes.vouchers import voucher
 from apps.routes.stock_transfer import stock_transfer
 from apps.routes.DMS import dms
 from apps.routes.pajak import pajak
+from apps.routes.sales import sales
+from apps.routes.sales_kunjungan import sales_kunjungan
 
 app = Flask(__name__)
 db = init_connection(app)
@@ -88,6 +90,8 @@ app.register_blueprint(voucher)
 app.register_blueprint(stock_transfer)
 app.register_blueprint(dms)
 app.register_blueprint(pajak)
+app.register_blueprint(sales)
+app.register_blueprint(sales_kunjungan)
 
 if __name__ == '__main__':
     # 1. Define the base directory of your project (Asumsi app.py ada di root project)

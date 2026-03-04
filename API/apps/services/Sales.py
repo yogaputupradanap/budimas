@@ -26,15 +26,16 @@ class Sales(BaseSales):
             .setRawQuery(
             """
                 SELECT 
-                users.tokens AS token, users.id AS id_user,
+                users.tokens AS token, 
+                users.id AS id_user,
                 sales.id AS id_sales,
                 users.nama AS nama_user,
                 users.email AS user_email,
                 users.password
                 FROM 
-                users JOIN sales ON users.id = sales.id_user 
-                WHERE 
-                users.email=:email
+                users 
+                JOIN sales ON users.id = sales.id_user 
+                WHERE users.email = :email
             """
             )
             .bindparams({"email": email})
@@ -43,10 +44,15 @@ class Sales(BaseSales):
             .result
         )
 
-        if not len(getInfo):
+        # ✅ FIX 1
+        if not getInfo:
             raise nonServerErrorException('Email salah atau tidak ada', 403)
-        
-        if not bcrypt.checkpw(password.encode('utf-8'), getInfo["password"].encode('utf-8')):
+
+        # ✅ FIX 2
+        if not bcrypt.checkpw(
+            password.encode('utf-8'),
+            getInfo["password"].encode('utf-8')
+        ):
             raise nonServerErrorException('Password salah', 403)
 
         return getInfo
@@ -319,31 +325,33 @@ class Sales(BaseSales):
     
     @handle_error
     def getSales(self, id_sales):
-        sales = (
+        # 1. Fetch the data
+        results = (
             self.query()
-            .setRawQuery(
-            """
-                SELECT 
-                sales.*,
-                jabatan.nama AS nama_jabatan,
-                cabang.nama AS nama_cabang
+            .setRawQuery("""
+                SELECT sales.*, jabatan.nama AS nama_jabatan, cabang.nama AS nama_cabang
                 FROM sales 
-                JOIN users 
-                ON sales.id_user = users.id
-                JOIN jabatan
-                ON jabatan.id = users.id_jabatan 
-                JOIN cabang
-                ON cabang.id = users.id_cabang
+                JOIN users ON sales.id_user = users.id
+                JOIN jabatan ON jabatan.id = users.id_jabatan 
+                JOIN cabang ON cabang.id = users.id_cabang
                 WHERE sales.id = :id_sales
-            """
-            )
+            """)
             .bindparams({"id_sales": id_sales})
             .execute()
             .fetchall()
             .get()
         )
 
-        user = User().getUser(sales[0]["id_user"], "sales", sales[0])
+        # 2. Check if results actually exist before accessing index [0]
+        if not results:
+            return {"error": "Sales record not found"}, 404
+
+        sales_data = results[0]
+
+        # 3. Verify 'getUser' exists in your User class. 
+        # If your method is actually named get_user, change it here:
+        user = User().getUser(sales_data["id_user"], "sales", sales_data)
+        
         return user
     
     @handle_error

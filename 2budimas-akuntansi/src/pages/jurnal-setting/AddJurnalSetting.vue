@@ -338,6 +338,39 @@ const handleSubmit = async () => {
   }
 };
 
+const coaSubList = ref([]);
+const loadingSub = ref(false);
+
+// Watcher untuk mendeteksi perubahan pada Main COA
+watch(() => selectedCoaMain.value, async (newParentId) => {
+    if (!newParentId) {
+        coaSubList.value = [];
+        return;
+    }
+
+    loadingSub.value = true;
+    try {
+        // Filter: id_perusahaan dan parent_id harus sama dengan selectedCoaMain
+        const clause = { 
+            "id_perusahaan =": selectedPerusahaan.value,
+            "parent_id =": newParentId 
+        };
+        
+        const url = `/api/base/coa/all?clause=${encodeURIComponent(JSON.stringify(clause))}`;
+        const res = await fetchWithAuth("GET", url);
+
+        if (res && res.result) {
+            coaSubList.value = res.result;
+        } else {
+            coaSubList.value = [];
+        }
+    } catch (e) {
+        console.error("Gagal mengambil sub-akun:", e);
+    } finally {
+        loadingSub.value = false;
+    }
+});
+
 /* -------------------------------------------------------
    🚀 LIFECYCLE
 ------------------------------------------------------- */
@@ -443,21 +476,21 @@ onMounted(() => {
       <Card no-subheader no-header class="tw-mt-6">
         <template #content>
           <div class=" tw-w-full tw-p-2  tw-mt-4">
-            <div v-for="(data,index) in dataJurnalMalDetail"
-                 class="form-grid-card-5-col tw-border-b last-of-type:tw-border-b-0 tw-p-2">
-              <Label label="Akun">
-                <SelectInput
-                    v-model="data.id_coa"
-                    class="tw-w-full"
-                    placeholder="Pilih Akun"
-                    size="md"
-                    :options="coa"
-                    :disabled="!selectedPerusahaan"
-                    :virtual-scroll="true"
-                    text-field="nama_akun"
-                    value-field="id_coa"
-                />
-              </Label>
+            <div v-for="(data, index) in dataJurnalMalDetail" :key="index"
+              class="form-grid-card-5-col tw-border-b last-of-type:tw-border-b-0 tw-p-2">
+            <Label label="Akun">
+              <SelectInput
+                  v-model="data.id_coa"
+                  class="tw-w-full"
+                  placeholder="Pilih Akun"
+                  size="md"
+                  :options="coaSubList" 
+                  :disabled="!selectedCoaMain"
+                  :virtual-scroll="true"
+                  text-field="nama_akun"
+                  value-field="id_coa"
+              />
+            </Label>
               <BFormRadioGroup
                   v-model="data.type"
                   :options="tipeTransaksiOption"

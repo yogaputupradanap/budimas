@@ -10,9 +10,10 @@ from apps.conn import db # Pastikan path koneksi db Anda benar
 token_auth = HTTPTokenAuth()
 
 class nonServerErrorException(Exception):
-    def __init__(self, code=500, message=''):
+    def __init__(self, message, status_code=400):
         super().__init__(message)
-        self.status_code = code
+        self.message = message
+        self.status_code = status_code
 
 @token_auth.verify_token
 def verify_token(token):

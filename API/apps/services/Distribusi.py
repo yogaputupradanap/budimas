@@ -3026,64 +3026,65 @@ class Distribusi(BaseServices):
             return {"status": "success",
                     "message": f"Realisasi pengiriman dengan No Faktur: {no_faktur} berhasil dikonfirmasi"}, 200
 
+
     @handle_error
     def get_distribusi_info(self):
         email = self.req("email")
         password = self.req("password")
+
         print("LOGIN ROUTE Distribusi")
-        user_info = (
-            self.query().setRawQuery(
-                """
-                    select 
-                    users.tokens AS token, 
-                    users.id AS id_user, 
-                    users.nama AS nama_user, 
-                    users.email AS user_email, 
-                    users.id_cabang AS id_cabang,
-                    users.password,
-                    cabang.nama as nama_cabang,
-                    cabang.alamat as alamat_cabang,
-                    cabang.telepon as telepon_cabang,
-                    cabang.npwp as npwp_cabang,
-                    jabatan.nama as nama_jabatan,
-                    wilayah1.nama as nama_wilayah1,
-                    wilayah2.nama as nama_wilayah2,
-                    wilayah3.nama as nama_wilayah3,
-                    wilayah4.nama as nama_wilayah4
-                    from users 
-                    join jabatan
-                    on jabatan.id = users.id_jabatan
-                    join cabang
-                    on cabang.id = users.id_cabang
-                    left join wilayah1
-                    on wilayah1.id = cabang.id_wilayah1
-                    left join wilayah2
-                    on wilayah1.id = cabang.id_wilayah2
-                    left join wilayah3
-                    on wilayah3.id = cabang.id_wilayah3
-                    left join wilayah4
-                    on wilayah4.id = cabang.id_wilayah4
-                    where 
-                    email = :email 
-                    and
-                    id_jabatan in (1, 6, 8, 12, 13, 14, 2) 
-                """
-            )
-            .bindparams({
-                "email": email
-            })
+
+        row_obj = (
+            self.query()
+            .setRawQuery("""
+                select 
+                users.tokens AS token, 
+                users.id AS id_user, 
+                users.nama AS nama_user, 
+                users.email AS user_email, 
+                users.id_cabang AS id_cabang,
+                users.password,
+                cabang.nama as nama_cabang,
+                cabang.alamat as alamat_cabang,
+                cabang.telepon as telepon_cabang,
+                cabang.npwp as npwp_cabang,
+                jabatan.nama as nama_jabatan,
+                wilayah1.nama as nama_wilayah1,
+                wilayah2.nama as nama_wilayah2,
+                wilayah3.nama as nama_wilayah3,
+                wilayah4.nama as nama_wilayah4
+                from users 
+                join jabatan on jabatan.id = users.id_jabatan
+                join cabang on cabang.id = users.id_cabang
+                left join wilayah1 on wilayah1.id = cabang.id_wilayah1
+                left join wilayah2 on wilayah2.id = cabang.id_wilayah2
+                left join wilayah3 on wilayah3.id = cabang.id_wilayah3
+                left join wilayah4 on wilayah4.id = cabang.id_wilayah4
+                where email = :email 
+                
+            """)
+            .bindparams({"email": email})
             .execute()
             .fetchone()
-            .result
         )
 
-        if not len(user_info) :
+        if not row_obj:
             raise nonServerErrorException("Email salah atau tidak ada")
 
-        if not bcrypt.checkpw(password.encode('utf-8'), user_info["password"].encode('utf-8')):
-            raise nonServerErrorException('Password salah', 403)
+        # Convert ke dict
+        user_info = dict(row_obj.result)
 
-        return user_info
+        if not bcrypt.checkpw(
+            password.encode("utf-8"),
+            user_info["password"].encode("utf-8")
+        ):
+            raise nonServerErrorException("Password salah", 403)
+
+        # Hapus password dari response
+        user_info.pop("password", None)
+
+        # ⚠ Kalau frontend lama tidak pakai wrapper:
+        return jsonify(user_info)
 
     @handle_error
     def getUserInfo(self, id_user):

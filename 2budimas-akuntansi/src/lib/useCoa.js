@@ -6,6 +6,7 @@ const useCoa = () => {
     const coa = ref([])
     const coaMain = ref([])
     
+    
     const getCoa = async (id_perusahaan) => {
         loading.value = true;
         try {
@@ -35,11 +36,15 @@ const useCoa = () => {
     const getCoaMain = async (id_perusahaan) => {
     loading.value = true;
     try {
-        const clause = { "id_perusahaan =": id_perusahaan };
+        const clause = { 
+            "id_perusahaan =": id_perusahaan,
+            "parent_id IS": "NULL"
+        };
         const url = `/api/base/coa/all?clause=${encodeURIComponent(JSON.stringify(clause))}`;
         const res = await fetchWithAuth("GET", url);
         
-        // console.log("Response Asli API:", res);
+        console.log("Response Asli API:", res);
+        console.log("Payload yang dikirim:", JSON.stringify(clause));
 
         // PERBAIKAN DI SINI:
         // Karena response Anda adalah { result: [...] }, maka ambil res.result

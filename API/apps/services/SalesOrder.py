@@ -7,10 +7,10 @@ from apps.models import (
     draft_voucher,
     sales_order_detail,
     faktur,
-    produk as produk_model,
-    plafon,
-    stok,
-    proses_picking, customer, cabang, perusahaan, principal, ReturRequest, ReturRequestDetail, OrderBatchModel
+    Produk as produk_model,
+    Plafon,
+    Stok,
+    proses_picking, Customer, Cabang, Perusahaan, Principal, ReturRequest, ReturRequestDetail, OrderBatchModel
 )
 from . import BaseServices
 from apps.handler import handle_error, handle_error_rollback, nonServerErrorException

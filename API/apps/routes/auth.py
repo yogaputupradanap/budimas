@@ -9,6 +9,7 @@ from apps.services.StockTransfer import StockTransfer
 from apps.services.DMS import DMS
 from apps.services.Pajak import Auth as loginpajak
 from apps.services.Sales import Sales
+from apps.services.SalesCanvas import SalesCanvas
 # from apps.services.Akuntansi import BaseAkuntasi
 
 
@@ -25,7 +26,7 @@ def _1031(): return UserS().token()
 
 @auth.route('/api/auth/sales/login', methods=["POST"])
 def _11(): 
-    print("LOGIN ROUTE SALES HIT")
+    # print("LOGIN ROUTE SALES HIT")
     return Sales().get_token_by_credential()
 
 @auth.route('/api/auth/distribusi/login', methods=["POST"])
@@ -53,3 +54,6 @@ def _700():
 @auth.route('/api/auth/pajak-login', methods=["POST"])
 def _702():   
     return loginpajak().login()
+
+@auth.route('/api/auth/sales-canvas/login', methods=["POST"])
+def _703(): return SalesCanvas().get_token_by_credential()

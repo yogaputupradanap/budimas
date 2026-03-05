@@ -1,6 +1,6 @@
 from flask import Blueprint, request
 from apps.services.BaseServices import token_auth
-from apps.services import Pembayaran
+from apps.services.Pembayaran import Pembayaran
 
 finance = Blueprint("finance", __name__, url_prefix="/api/finance/")
 finance.before_request(lambda: token_auth.login_required(lambda: None)())

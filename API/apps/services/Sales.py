@@ -10,6 +10,7 @@ from collections import defaultdict
 import bcrypt
 from apps.lib.helper import GetWhereBindParams
 from apps.services.BaseSales import BaseSales
+from apps.services.User import UserService
 
 from ..lib.helper import get_day_number_for_date, get_week_number_for_date, is_holiday, get_current_day_number, \
     get_week_number_cycle, get_now_datetime
@@ -60,194 +61,122 @@ class Sales(BaseSales):
     @handle_error
     def salesInfo(self, userid, tahun=None, bulan=None):
         isRange = tahun and bulan
-        current_date, _, _ = str(datetime.now()), None, None
-        last_update = str(datetime.now())
+        now = datetime.now()
+        current_date = now.strftime("%Y-%m-%d")
+        last_update = now.strftime("%Y-%m-%d %H:%M:%S")
 
-        data_dict, param2 = {"userid": userid}, {"userid": userid}
+        # Fungsi pembantu untuk menangani response List atau Dict
+        def safe_extract(response, key, default=0):
+            if isinstance(response, list): 
+                return response[0].get(key, default) if response else default
+            if isinstance(response, dict): 
+                res = response.get('result')
+                if isinstance(res, list):
+                    return res[0].get(key, default) if res else default
+                if isinstance(res, dict):
+                    return res.get(key, default)
+            return default
+
+        data_dict = {"userid": userid}
         
         if isRange:
             data_dict["from_date"] = f"{tahun}-{bulan}-01"
             last_day = monthrange(int(tahun), int(bulan))[1]
             data_dict["to_date"] = f"{tahun}-{bulan}-{last_day}"
         else:
-            data_dict["tanggal_order"], param2["current_date"] = current_date, current_date
-        # total order
-        baseQuery = f"""
-              FROM plafon 
-              JOIN sales_order ON sales_order.id_plafon = plafon.id 
-                """
-       
-        clause = {
-            "userid": "plafon.id_user = :userid",
-        }
+            data_dict["tanggal_order"] = current_date
+
+        # 1. Base query & Clauses
+        baseQuery = " FROM plafon JOIN sales_order ON sales_order.id_plafon = plafon.id "
+        clause = {"userid": "plafon.id_user = :userid"}
         tanggal_order_clause = "sales_order.tanggal_order BETWEEN :from_date AND :to_date" if isRange else "sales_order.tanggal_order = :tanggal_order"
 
         where, _ = GetWhereBindParams(data_dict, clause)
-        where_clause =  f""" WHERE {tanggal_order_clause} AND """ + where if where else ""
-        queryTotalOrder = f"""
-                SELECT count(sales_order.id)
-                {baseQuery}
-                {where_clause}
-            """
-        print("Query Total Order: ", queryTotalOrder)
-        print("Params Total Order: ", data_dict)
-        totalOrder = (
-            self.query()
-            .setRawQuery(
-                queryTotalOrder
-            )
-            .bindparams(data_dict)
-            .execute()
-            .fetchall()
-            .get()
-        )
+        where_clause = f" WHERE {tanggal_order_clause} AND {where}" if where else f" WHERE {tanggal_order_clause}"
 
-        queryCustomerOrder = f"""
-                SELECT COUNT(DISTINCT plafon.id_customer) 
-                {baseQuery}
-                {where_clause}
-            """
-        
-        print("Query Total Customer Order: ", queryCustomerOrder)
-        print("Params Total Customer Order: ", data_dict)
-        # total customer order
-        totalCustomerOrder = (
-            self.query()
-            .setRawQuery(
-                queryCustomerOrder
-            )
-            .bindparams(data_dict)
-            .execute()
-            .fetchall()
-            .get()
-        )
+        # 2. Eksekusi Query - Total Order
+        queryTotalOrder = f"SELECT count(sales_order.id) as count {baseQuery} {where_clause}"
+        resTotalOrder = self.query().setRawQuery(queryTotalOrder).bindparams(data_dict).execute().fetchall().get()
+        totalOrderCount = safe_extract(resTotalOrder, 'count')
 
-        # mendapatkan list customer yang sudah dikunjungi
-        # data_dict_belumKunjungan = {**data_dict}
-        
+        # 3. Eksekusi Query - Total Customer Order
+        queryCustomerOrder = f"SELECT COUNT(DISTINCT plafon.id_customer) as count {baseQuery} {where_clause}"
+        resCustomerOrder = self.query().setRawQuery(queryCustomerOrder).bindparams(data_dict).execute().fetchall().get()
+        totalCustomerOrderCount = safe_extract(resCustomerOrder, 'count')
+
+        # 4. Kunjungan setup
         extra_clause = self.GetSchedule()
         tanggal_kunjungan_clause = "sales_kunjungan.tanggal BETWEEN :from_date AND :to_date" if isRange else "sales_kunjungan.tanggal = :tanggal_order"
         
-        where_belumKunjungan, _ = GetWhereBindParams(data_dict, clause)
-        where_belumKunjungan_clause = f""" WHERE {tanggal_kunjungan_clause} AND """ + (where_belumKunjungan if where_belumKunjungan else "") + f" AND ({extra_clause})"
-
+        # 5. Belum Kunjungan
+        where_belumKunjungan_clause = f" WHERE {tanggal_kunjungan_clause} AND {where} AND ({extra_clause})"
         queryKunjungan = f"""
-                select count(distinct plafon.id_customer) 
-                from plafon
-                join sales_kunjungan on sales_kunjungan.id_plafon = plafon.id
-                join plafon_jadwal on plafon_jadwal.id = sales_kunjungan.id_plafon_jadwal
+                SELECT count(distinct plafon.id_customer) as count
+                FROM plafon
+                JOIN sales_kunjungan ON sales_kunjungan.id_plafon = plafon.id
+                JOIN plafon_jadwal ON plafon_jadwal.id = sales_kunjungan.id_plafon_jadwal
                 {where_belumKunjungan_clause}
-                  """
-        
-        belumKunjungan = (
-            self.query()
-            .setRawQuery(queryKunjungan)
-            .bindparams(data_dict)
-            .execute()
-            .fetchone()
-            .result
-        )["count"]
+        """
+        resBelum = self.query().setRawQuery(queryKunjungan).bindparams(data_dict).execute().fetchone().get()
+        belumKunjungan = safe_extract(resBelum, 'count')
 
-        print("belum kunjungan: ", belumKunjungan)
-        print("kueri belum kunjungan: ", queryKunjungan)
+        # 6. Sudah Kunjungan
+        data_dict_sudah = {**data_dict, "status_1": 1, "status_2": 2}
+        querySudahKunjungan = f"""
+                SELECT count(distinct plafon.id_customer) as count
+                FROM plafon
+                JOIN sales_kunjungan ON sales_kunjungan.id_plafon = plafon.id 
+                JOIN plafon_jadwal ON plafon_jadwal.id = sales_kunjungan.id_plafon_jadwal
+                WHERE {tanggal_kunjungan_clause} AND {where} 
+                AND sales_kunjungan.status IN (:status_1, :status_2)
+                AND ({extra_clause})
+        """
+        resSudah = self.query().setRawQuery(querySudahKunjungan).bindparams(data_dict_sudah).execute().fetchone().get()
+        sudahKunjungan = safe_extract(resSudah, 'count')
 
-        status_kunjungan = [1, 2]  # sudah berkunjung
-        clause_sudahKunjungan = {
-            "userid": "plafon.id_user = :userid",
-            "status_kunjungan": "sales_kunjungan.status in :status_kunjungan",
-        }
-
-        data_dict_sudahKunjungan = {**data_dict, "status_kunjungan": status_kunjungan}
-      
-        where_sudahKunjungan, _ = GetWhereBindParams(data_dict_sudahKunjungan, clause_sudahKunjungan)
-        where_sudahKunjungan_clause = f""" WHERE {tanggal_kunjungan_clause} AND """ + (where_sudahKunjungan if where_sudahKunjungan else "") + f" AND ({extra_clause})"
-
-        queryKunjungan = f"""
-                select count(distinct plafon.id_customer)
-                from plafon
-                join sales_kunjungan on sales_kunjungan.id_plafon = plafon.id 
-                join plafon_jadwal on plafon_jadwal.id = sales_kunjungan.id_plafon_jadwal
-                {where_sudahKunjungan_clause}
-                  """
-        print("kueri sudah kunjungan: ", queryKunjungan)
-        print("klause sudah kunjungan: ", clause_sudahKunjungan)
-        
-        sudahKunjungan = (
-              self.query()
-              .setRawQuery(queryKunjungan)
-              .bindparams_v2(data_dict_sudahKunjungan, ['status_kunjungan'])
-              .execute()
-              .fetchone()
-              .result
-        )["count"]
-        
-        print("sudah berkunjung: ", sudahKunjungan)
-
-        # mendapatkan totol order dalam rupiah
+        # 7. Total Transaksi (Rupiah)
         queryTotalTransaksi = f"""
-                    select SUM(sales_order_detail.subtotalorder)
-                    {baseQuery}
-                    join sales_order_detail on sales_order_detail.id_sales_order = sales_order.id
-                    {where_clause}
-                """
-        print("Query Total Transaksi: ", queryTotalTransaksi)
-        print("Params Total Transaksi: ", data_dict)
-        totalTransaksi = (
-            self.query().setRawQuery(
-                queryTotalTransaksi
-            )
-            .bindparams(data_dict)
-            .execute()
-            .fetchone()
-            .result
-        )["sum"]
+                SELECT SUM(sales_order_detail.subtotalorder) as sum
+                {baseQuery}
+                JOIN sales_order_detail ON sales_order_detail.id_sales_order = sales_order.id
+                {where_clause}
+        """
+        resTransaksi = self.query().setRawQuery(queryTotalTransaksi).bindparams(data_dict).execute().fetchone().get()
+        totalTransaksiVal = safe_extract(resTransaksi, 'sum')
 
+        # 8. Total Pencapaian (Setoran)
         queryTotalPencapaian = f"""
-                    select sum(setoran_customer.jumlah_setoran)
-                    {baseQuery}
-                    join setoran_customer on setoran_customer.id_sales_order = sales_order.id
-                    {where_clause}
-                    """
+                SELECT sum(setoran_customer.jumlah_setoran) as sum
+                {baseQuery}
+                JOIN setoran_customer ON setoran_customer.id_sales_order = sales_order.id
+                {where_clause}
+        """
+        resPencapaian = self.query().setRawQuery(queryTotalPencapaian).bindparams(data_dict).execute().fetchone().get()
+        totalPencapaianVal = safe_extract(resPencapaian, 'sum')
 
-        totalPencapaian = (
-            self.query().setRawQuery(
-                queryTotalPencapaian
-            )
-            .bindparams(data_dict)
-            .execute()
-            .fetchone()
-            .result
-        )["sum"]
-
-        totalCallPlan = 0
+        # 9. Total Call Plan (Jika isRange)
+        totalCallPlanVal = 0
         if isRange:
-            where_kunjungan_clause = f""" WHERE {tanggal_kunjungan_clause} AND """ + (where_belumKunjungan if where_belumKunjungan else "")
+            where_kunj_clause = f" WHERE {tanggal_kunjungan_clause} AND {where}"
             queryTotalCallPlan = f"""
-                        select count(distinct plafon.id_customer) 
-                        from plafon
-                        join sales_kunjungan on sales_kunjungan.id_plafon = plafon.id
-                        join plafon_jadwal on plafon_jadwal.id = sales_kunjungan.id_plafon_jadwal
-                        {where_kunjungan_clause}
-                       """
-            totalCallPlan = (
-                self.query()
-                .setRawQuery(queryTotalCallPlan)
-                .bindparams(data_dict)
-                .execute()
-                .fetchone()
-                .result
-            )['count']
-            # totalCallPlan = belumKunjungan
+                        SELECT count(distinct plafon.id_customer) as count
+                        FROM plafon
+                        JOIN sales_kunjungan ON sales_kunjungan.id_plafon = plafon.id
+                        JOIN plafon_jadwal ON plafon_jadwal.id = sales_kunjungan.id_plafon_jadwal
+                        {where_kunj_clause}
+            """
+            resCP = self.query().setRawQuery(queryTotalCallPlan).bindparams(data_dict).execute().fetchone().get()
+            totalCallPlanVal = safe_extract(resCP, 'count')
 
         return {
-            "totalOrder": totalOrder[0]["count"],
-            "totalCustomerOrder": totalCustomerOrder[0]["count"],
-            "belumKunjungan": belumKunjungan or 0,
-            "sudahBerkunjung": sudahKunjungan or 0,
-            "updateTerakhir": str(last_update),
-            "totalTransaksi": totalTransaksi if totalTransaksi else 0,
-            "totalCallPlan": totalCallPlan,
-            "totalPencapaian": totalPencapaian if totalPencapaian else 0,
+            "totalOrder": totalOrderCount,
+            "totalCustomerOrder": totalCustomerOrderCount,
+            "belumKunjungan": belumKunjungan,
+            "sudahBerkunjung": sudahKunjungan,
+            "updateTerakhir": last_update,
+            "totalTransaksi": totalTransaksiVal,
+            "totalCallPlan": totalCallPlanVal,
+            "totalPencapaian": totalPencapaianVal,
         }
 
     def calculate_call_plan(self, userid, tahun, bulan):
@@ -325,8 +254,8 @@ class Sales(BaseSales):
     
     @handle_error
     def getSales(self, id_sales):
-        # 1. Fetch the data
-        results = (
+        # Ambil output dari DB
+        response = (
             self.query()
             .setRawQuery("""
                 SELECT sales.*, jabatan.nama AS nama_jabatan, cabang.nama AS nama_cabang
@@ -342,17 +271,18 @@ class Sales(BaseSales):
             .get()
         )
 
-        # 2. Check if results actually exist before accessing index [0]
-        if not results:
-            return {"error": "Sales record not found"}, 404
+        # 1. Ambil list dari dalam key 'result'
+        data_list = response.get('result', [])
 
-        sales_data = results[0]
+        # 2. Cek apakah datanya ada sebelum akses indeks [0]
+        if not data_list:
+            return {"status": "error", "message": "Sales tidak ditemukan"}, 404
 
-        # 3. Verify 'getUser' exists in your User class. 
-        # If your method is actually named get_user, change it here:
-        user = User().getUser(sales_data["id_user"], "sales", sales_data)
-        
-        return user
+        sales_data = data_list[0]
+
+        # 3. Panggil UserService (pastikan sudah di-import)
+        # from apps.services.User import UserService
+        return UserService().getUser(sales_data["id_user"], "sales", sales_data)
     
     @handle_error
     def history(self, id_plafon, jenis_faktur):
@@ -429,7 +359,8 @@ class Sales(BaseSales):
             AND sales_order.tanggal_order BETWEEN :from_date AND :to_date
         """
         
-        charts_data = (
+        # Query execution
+        response = (
             self.query()
             .setRawQuery(query)
             .bindparams(params)
@@ -438,14 +369,20 @@ class Sales(BaseSales):
             .get()
         )
         
+        # --- PERBAIKAN DI SINI ---
+        # Ambil list data dari dalam key 'result'
+        charts_data = response.get('result', [])
+        
         # Process results
         result_dict = defaultdict(lambda: {"omset": 0})
         
+        # Sekarang looping ini aman karena charts_data sudah berbentuk LIST
         for val in charts_data:
-            tanggal = val["tanggal_order"]
-            omset = val["omset"]
+            tanggal = str(val["tanggal_order"]) # Pastikan jadi string untuk key dict
+            omset = val["omset"] or 0 # Antisipasi jika omset None
+            
             result_dict[tanggal]["tanggal"] = tanggal
             result_dict[tanggal]["omset"] += omset
+            
         result = list(result_dict.values())
-        print("Omset result: ", result)
         return result

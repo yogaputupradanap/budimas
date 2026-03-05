@@ -2,8 +2,7 @@ from apps.lib.helper import date_now, to_array_string
 from datetime import datetime, timedelta
 from . import BaseServices
 from apps.handler import handle_error, handle_error_rollback
-from apps.models import setoran, sales_order
-from ..models.setoran_customer import setoran_customer
+from apps.models import setoran, sales_order, setoran_customer
 
 
 class Pembayaran(BaseServices):

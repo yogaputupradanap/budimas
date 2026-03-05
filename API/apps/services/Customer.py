@@ -8,26 +8,24 @@ class Customer(BaseServices):
 
     @handle_error
     def getSalesCustomer(self, id_user):
+        query = """
+            SELECT customer.nama, customer.kode, customer.id
+            FROM plafon
+            JOIN customer ON customer.id = plafon.id_customer
+            WHERE plafon.id_user = :id_user
+            GROUP BY customer.nama, customer.kode, customer.id
         """
-         @brief Get customer information for sales. This is a wrapper around L { Query } to get the data for a customer and its sales
-         @param id_user ID of the user to get the customer for
-         @param nama_customer NAMA of the customer to get
-         @return A dictionary with the customer information or None if not found ( for example if id_user is None
-        """
-        query = (
-            """
-                SELECT customer.nama, customer.kode, customer.id
-                FROM plafon
-                JOIN customer ON customer.id = plafon.id_customer
-                LEFT JOIN sales ON sales.id = plafon.id_sales
-                WHERE plafon.id_user = :id_user
-				group by customer.nama, customer.kode, customer.id
-            """
-        )
-        
         params = {"id_user": id_user}
         
-        return self.query().setRawQuery(query).bindparams(params).execute().fetchall().get()
+        # Eksekusi dan ambil response
+        res = self.query().setRawQuery(query).bindparams(params).execute().fetchall().get()
+
+        # Pastikan return selalu list agar Flask tidak error
+        if isinstance(res, list):
+            return res
+        if isinstance(res, dict):
+            return res.get('result', [])
+        return []
 
     @handle_error
     def getHistoryCustomer(self):

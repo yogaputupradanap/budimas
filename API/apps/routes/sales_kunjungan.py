@@ -2,7 +2,7 @@ from flask import Blueprint
 
 from apps.lib.encryption import encrypt_response
 from apps.services.BaseServices import token_auth
-from apps.services import SalesKunjungan
+from apps.services.SalesKunjungan import SalesKunjungan
 
 sales_kunjungan = Blueprint('sales_kunjungan_bp', __name__, url_prefix='/api/sales-kunjungan/')
 sales_kunjungan.before_request(lambda: token_auth.login_required(lambda: None)())

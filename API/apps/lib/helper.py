@@ -570,3 +570,169 @@ def GetWhereBindParams(data = {}, clauses = {}):
 
     where_sql = " AND ".join(parts)
     return where_sql, bind
+
+def extract_data(result, data_key='pages'):
+    """
+    Extract data from paginated response or return as is if not paginated.
+
+    Args:
+        result: Response from service method
+        data_key: Key to extract data from if paginated (default: 'pages')
+    """
+    if isinstance(result, dict) and data_key in result:
+        return result[data_key]
+    else:
+        return list(result) if result else []
+
+def format_paginated_response(request_handler, data, **kwargs):
+    """
+    Usage:
+        return format_paginated_response(
+            self, data,
+            example_data = example_data
+        )
+    """
+    no_paginate = request_handler.req('no-paginate')
+    
+    if no_paginate == 'true':
+        return data
+    else:
+        response = {
+            "pages": data,
+            "total_data": len(data) if isinstance(data, list) else 0,
+            "total_pages": 1
+        }
+        
+        response.update(kwargs)
+        return response
+    
+def format_result_response(self, result, data, key='pages'):
+    if isinstance(result, dict) and key in result:
+        result[key] = data
+        return result
+    else:
+        return format_paginated_response(self, data)
+
+def status_canvas(status):
+    """
+    Mengembalikan status canvas dalam format yang sesuai.
+
+    @param status: Status canvas (int)
+    @return: string status canvas
+    """
+    status_map = {
+        1: "Requested",
+        2: "Approved",
+        3: "Rejected",
+    }
+    return status_map.get(status, "Tidak Diketahui")
+
+def query_with_filters(service, base_query, base_params, **options):
+    """
+    Args:
+        service: Service instance
+        base_query: SQL query dasar
+        base_params: Parameter dasar
+        **options: Optional configurations
+    Options:
+        - search_in: List kolom untuk global search (default: semua kolom SELECT)
+        - filter_by: Dict {param_name: column_name} untuk specific filters
+        - order_by: String ORDER BY clause
+        - table_alias: String alias tabel untuk prefix kolom
+        - raw_data: Boolean, jika True return raw data tanpa pagination format
+    """
+    
+    # Get request parameters
+    filters = service.req('filters') 
+    columns = service.req('columns') 
+    limit = int(service.req('limit') or 5)
+    page = int(service.req('page') or 1)
+    
+    search_in = options.get('search_in', [])
+    filter_by = options.get('filter_by', {})
+    order_by = options.get('order_by', '')
+    table_alias = options.get('table_alias', '')
+    
+    if not search_in:
+        select_part = base_query.split('FROM')[0].replace('SELECT', '')
+        search_in = re.findall(r'\s+as\s+(\w+)', select_part, re.IGNORECASE)
+        
+        if not search_in:
+            search_in = re.findall(r'(\w+\.\w+)(?:\s+AS\s+\w+)?', select_part, re.IGNORECASE)
+    
+    query = base_query
+    params = base_params.copy()
+    
+    for param_name, column_name in filter_by.items():
+        value = service.req(param_name)
+        if value:
+            prefix = f"{table_alias}." if table_alias and '.' not in column_name else ''
+            query += f" AND {prefix}{column_name} = :{param_name}"
+            params[param_name] = int(value) if param_name == 'status' else value
+    
+    if filters and filters.strip():
+        search_columns = []
+        
+        if columns:
+            if isinstance(columns, str):
+                if columns.startswith('[') and columns.endswith(']'):
+                    try:
+                        search_columns = json.loads(columns)
+                    except:
+                        search_columns = [columns.strip('[]"')]
+                else:
+                    search_columns = [columns]
+            elif ', ' in columns:
+                search_columns = [col.strip().strip('"') for col in columns.split(',')]
+            else:
+                search_columns = [columns.strip('"')]    
+                
+        if not search_columns:
+            search_columns = search_in
+        
+        valid_columns = []
+        for col in search_columns:
+            if col in search_in:
+                valid_columns.append(col)
+            elif col in ["nama_produk"]:
+                valid_columns.append(col)
+        
+        if valid_columns:
+            search_conditions = []
+            for i, col in enumerate(valid_columns):
+                prefix = f"{table_alias}." if table_alias and '.' not in col else ''
+                param_key = f"search_{i}"
+                search_conditions.append(f"CAST({prefix}{col} AS TEXT) ILIKE :{param_key}")
+                params[param_key] = f"%{filters}%"
+                
+            if search_conditions: 
+                query += f" AND ({' OR '.join(search_conditions)})"
+    
+    if order_by:
+        query += f" {order_by}"
+    
+    query_no_order = re.sub(r'ORDER BY[\s\S]*$', '', query, flags=re.IGNORECASE)
+    count_query = f"SELECT COUNT(*) AS total_data FROM ({query_no_order}) AS subquery"
+    count_result = service.query().setRawQuery(count_query).bindparams(params).execute().fetchone().result
+    total_data = count_result['total_data'] if count_result else 0
+    
+    offset = (page - 1) * limit
+    paginated_query = f"{query} LIMIT :limit OFFSET :offset"
+    params['limit'] = limit
+    params['offset'] = offset
+    
+    result = service.query().setRawQuery(paginated_query).bindparams(params).execute().fetchall().result
+    data = set(result) if result else []
+    
+    total_pages = (total_data + limit - 1) // limit if limit > 0 else 1
+    
+    if options.get('raw_data', False):
+        return data
+    if service.req('no-paginate') == 'true':
+        return data
+    else:
+        return {
+            "pages": data,
+            "total_data": total_data,
+            "total_pages": total_pages
+        }

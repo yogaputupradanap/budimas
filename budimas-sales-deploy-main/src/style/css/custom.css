@@ -1,0 +1,757 @@
+/* ------------------------------------------------------- */
+/* 1. External Sources Import */
+/* ------------------------------------------------------- */
+/* 1.1. Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Poppins&display=swap");
+/* 1.2. Icons */
+@import url(icons/material-design-iconic-font/css/materialdesignicons.min.css);
+
+/* ------------------------------------------------------- */
+/* 2. Generals */
+/* ------------------------------------------------------- */
+/* --------------- */
+/* 2.1. Variables  */
+/* --------------- */
+:root {
+  /* ------------ */
+  /* 2.1.1. Icons */
+  /* ------------ */
+  --mdi-calendar: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512"><path d="M152 24c0-13.3-10.7-24-24-24s-24 10.7-24 24V64H64C28.7 64 0 92.7 0 128v16 48V448c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V192 144 128c0-35.3-28.7-64-64-64H344V24c0-13.3-10.7-24-24-24s-24 10.7-24 24V64H152V24zM48 192H400V448c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16V192z"/></svg>');
+  --mdi-eye: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' style='width:24px;height:24px' viewBox='0 0 20 20'%3E%3Cpath fill='currentColor' d='M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z' /%3E%3C/svg%3E");
+  --mdi-eye-off: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' style='width:24px;height:24px' viewBox='0 0 20 20'%3E%3Cpath fill='currentColor' d='M11.83,9L15,12.16C15,12.11 15,12.05 15,12A3,3 0 0,0 12,9C11.94,9 11.89,9 11.83,9M7.53,9.8L9.08,11.35C9.03,11.56 9,11.77 9,12A3,3 0 0,0 12,15C12.22,15 12.44,14.97 12.65,14.92L14.2,16.47C13.53,16.8 12.79,17 12,17A5,5 0 0,1 7,12C7,11.21 7.2,10.47 7.53,9.8M2,4.27L4.28,6.55L4.73,7C3.08,8.3 1.78,10 1,12C2.73,16.39 7,19.5 12,19.5C13.55,19.5 15.03,19.2 16.38,18.66L16.81,19.08L19.73,22L21,20.73L3.27,3M12,7A5,5 0 0,1 17,12C17,12.64 16.87,13.26 16.64,13.82L19.57,16.75C21.07,15.5 22.27,13.86 23,12C21.27,7.61 17,4.5 12,4.5C10.6,4.5 9.26,4.75 8,5.2L10.17,7.35C10.74,7.13 11.35,7 12,7Z' /%3E%3C/svg%3E");
+  --mdi-arrow: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+  /* ------------- */
+  /* 2.1.2. Colors */
+  /* ------------- */
+  --primary: #01579b;
+  --secondary: #1976d2;
+  --success: #14e135;
+  --success-secondary: #11c02e;
+  --danger: #ff3232;
+  --danger-secondary: #bd2727;
+  --bg: #edf0f2;
+  --grey: #bdbdbd;
+  --grey-secondary: #8a8a8a;
+  --active: #1be1af;
+  --disable: #6b6b6b;
+  --disable-secondary: #3d3d3d;
+  --white: #ffffff;
+  /* ----------------------------- */
+  /* 2.1.3. Forms Default Settings */
+  /* ----------------------------- */
+  --input-padding: 0.45rem 1rem;
+  --input-width: 100%;
+  --input-height: calc(1.5em + 0.75rem + 6px);
+  --input-border: 1px solid rgba(0, 0, 0, 0.35);
+  --input-border-error: 1px solid var(--danger);
+  --input--bg-color: var(--white);
+  --input-font-size: 0.875rem;
+  --input-font-color: #4f5467;
+  --input-font-weight: 500;
+  --input-line-height: 1.5;
+  --select2-margin-top: -0.05rem;
+  --select2-margin-x: 0.5rem;
+  /* ------------- */
+  /* 2.1.3. Sizing */
+  /* ------------- */
+  --default-sizing: 16px; /* Following from Bootstrap Default Sizing */
+  /* ------------- */
+  /* 2.1.4. Others */
+  /* ------------- */
+  --border-accent-1: 1px solid rgba(0, 0, 0, 0.12);
+}
+/* ----------- */
+/* 2.2. Fonts  */
+/* ----------- */
+* {
+  font-family: "Poppins", sans-serif !important;
+}
+
+/* ------------------------------------------------------- */
+/* 3. Additonal / Custom Properties */
+/* ------------------------------------------------------- */
+/* ----------------------- */
+/* 3.1. Background Colors  */
+/* ----------------------- */
+.bg-custom {
+  background-color: var(--bg) !important;
+}
+.bg-c-primary {
+  background-color: var(--primary) !important;
+}
+.bg-c-secondary {
+  background-color: var(--secondary) !important;
+}
+.bg-c-success {
+  background-color: var(--success) !important;
+}
+.bg-c-cancel {
+  background-color: var(--danger) !important;
+}
+.bg-c-active {
+  background-color: var(--active) !important;
+}
+.bg-c-white {
+  background-color: var(--white) !important;
+}
+.bg-c-disable {
+  background-color: var(--disable) !important;
+}
+/* ------------- */
+/* 3.2. Buttons  */
+/* ------------- */
+.btn-primary {
+  background-color: var(--secondary);
+}
+.btn-c-primary {
+  color: var(--white);
+  border-color: var(--secondary);
+  background-color: var(--secondary);
+}
+.btn-c-primary:hover {
+  color: var(--white);
+  border-color: var(--primary);
+  background-color: var(--primary);
+}
+.btn-c-success {
+  color: var(--white);
+  border-color: var(--success);
+  background-color: var(--success);
+}
+.btn-c-success:hover {
+  color: var(--white);
+  background-color: var(--success-secondary);
+  border-color: var(--success-secondary);
+}
+.btn-c-danger {
+  color: var(--white);
+  border-color: var(--danger);
+  background-color: var(--danger);
+}
+.btn-c-danger:hover {
+  color: var(--white);
+  background-color: var(--danger-secondary);
+  border-color: var(--danger-secondary);
+}
+.btn-c-disable {
+  color: var(--white);
+  background-color: var(--disable);
+  border-color: var(--disable);
+}
+.btn-c-disable:hover {
+  color: var(--white);
+  background-color: var(--disable-secondary);
+  border-color: var(--disable-secondary);
+}
+.btn-c-grey {
+  color: var(--white);
+  background-color: var(--grey);
+  border-color: var(--grey);
+}
+.btn-c-grey:hover {
+  color: var(--white);
+  background-color: var(--grey-secondary);
+  border-color: var(--grey-secondary);
+}
+.btn {
+  border-radius: 0.5rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+.btn-tool {
+  background-color: none;
+  padding-top: 0px;
+  padding-right: 0.2rem;
+  padding-bottom: 0px;
+  padding-left: 0px;
+}
+.btn-tool i {
+  font-size: 1.05rem;
+  -webkit-text-stroke: 2px var(--input-font-color);
+}
+.btn-group button,
+.btn-group a,
+.btn-control {
+  color: var(--white) !important;
+  border-color: var(--white);
+  border-width: 4px;
+  padding-top: 0.5rem;
+  padding-right: 1rem;
+  padding-top: 0.5rem;
+  padding-left: 1rem;
+}
+.btn-group button i,
+.btn-group a i,
+.btn-control i {
+  margin-right: 0.5rem;
+}
+/* ------------ */
+/* 3.3. Border  */
+/* ------------ */
+.r-4 {
+  border-radius: 4px !important;
+}
+.r-8 {
+  border-radius: 4rem !important;
+}
+.pills {
+  border-radius: 23px !important;
+}
+.border-top {
+  border-top: var(--border-accent-1) !important;
+}
+.border-bottom {
+  border-bottom: var(--border-accent-1) !important;
+}
+/* ------------ */
+/* 3.4. Stroke  */
+/* ------------ */
+.stroke-white-2 {
+  -webkit-text-stroke: 2px white;
+}
+.stroke-info-text {
+  -webkit-text-stroke: 0.3px #2255a4;
+}
+/* Icons */
+.btn-group button .mdi.mdi-check {
+  -webkit-text-stroke: 2px white !important;
+}
+.btn-group button .mdi.mdi-minus {
+  -webkit-text-stroke: 2px white !important;
+}
+.btn-group button .mdi.mdi-plus {
+  -webkit-text-stroke: 2px white !important;
+}
+.btn-group button .mdi.mdi-close {
+  -webkit-text-stroke: 2px white !important;
+}
+.btn .mdi.mdi-check {
+  -webkit-text-stroke: 2px white !important;
+}
+.btn .mdi.mdi-minus {
+  -webkit-text-stroke: 2px white !important;
+}
+.btn .mdi.mdi-plus {
+  -webkit-text-stroke: 2px white !important;
+}
+/* --------------------- */
+/* 3.5. Additional Width */
+/* --------------------- */
+.w-20 {
+  width: 20%;
+}
+.w-120 {
+  width: 120%;
+}
+.w-130 {
+  width: 130%;
+}
+.w-150 {
+  width: 150%;
+}
+/* --------------------- */
+/* 3.5. Additional Font Weight */
+/* --------------------- */
+.fw-300 {
+  font-weight: 300 !important;
+}
+.fw-400 {
+  font-weight: 400 !important;
+}
+.fw-500 {
+  font-weight: 500 !important;
+}
+.fw-600 {
+  font-weight: 600 !important;
+}
+/* ------------- */
+/* 3.6. Pointers */
+/* ------------- */
+.def-point {
+  pointer-events: none;
+}
+/* ------------- */
+/* 3.7. Badges   */
+/* ------------- */
+.badge.badge-label {
+  padding-left: 20px;
+  padding-top: 6px;
+  padding-right: 20px;
+  padding-bottom: 6px;
+  font-weight: 500;
+  font-size: 13px;
+  border-radius: 23px !important;
+  pointer-events: none !important;
+  white-space: nowrap !important;
+}
+
+/* ------------------------------------------------------- */
+/* 4. Components */
+/* ------------------------------------------------------- */
+/* ----------- */
+/* 4.1. Inputs */
+/* ----------- */
+/* --------------------- */
+/* 4.1.1. Inputs Default */
+/* --------------------- */
+.form-control-modal {
+  display: block;
+  width: var(--input-width);
+  height: var(--input-height);
+  padding: var(--input-padding);
+  font-size: var(--input-font-size);
+  font-weight: var(--input-font-weight);
+  line-height: var(--input-line-height);
+  color: var(--input-font-color);
+  background-color: var(--input--bg-color);
+  background-clip: padding-box;
+  border: var(--input-border);
+  border-radius: var(--input-border-radius);
+  -webkit-transition: border-color 0.15s ease-in-out,
+    -webkit-box-shadow 0.15s ease-in-out;
+  transition: border-color 0.15s ease-in-out,
+    -webkit-box-shadow 0.15s ease-in-out;
+  -o-transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out,
+    -webkit-box-shadow 0.15s ease-in-out;
+}
+.form-control-modal::placeholder {
+  color: #489490;
+  font-style: italic;
+}
+.form-control-modal:read-only {
+  background-color: #eeeeee;
+}
+.form-control-modal.login {
+  padding: 1.375rem 0.75rem !important;
+}
+.form-group > label {
+  font-weight: 400 !important;
+  font-size: 0.9rem !important;
+  color: var(--input-font-color) !important;
+  -webkit-text-stroke: 0.3px var(--input-font-color);
+}
+.form-control-modal.form-error {
+  border: var(--input-border-error);
+}
+.form-error-info {
+  color: var(--danger-secondary);
+  margin-left: 0.6em;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  /* 
+     * Sembunyikan Scroller Arrow untuk Input.
+     * e.g. Scroller Arrow pada Input Number.
+     */
+  margin: 0;
+  -webkit-appearance: none;
+}
+/* ---------------------- */
+/* 4.1.2. Inputs Custom   */
+/* ---------------------- */
+.form-control-modal.password,
+.form-control-modal.datepicker,
+select.form-control-modal {
+  background-size: 16px 12px;
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+}
+.form-control-modal.password {
+  background-image: var(--mdi-eye);
+}
+.form-control-modal.password.active {
+  background-image: var(--mdi-eye-off);
+}
+.form-control-modal.datepicker {
+  background-image: var(--mdi-calendar);
+}
+select.form-control-modal {
+  background-image: var(--mdi-arrow);
+  -webkit-appearance: none;
+  appearance: none;
+}
+.datepicker[readonly] {
+  pointer-events: none;
+}
+/* ---------------------- */
+/* 4.1.3. Select2 Default */
+/* ---------------------- */
+.select2-container--default .select2-selection--single {
+  display: block;
+  width: var(--input-width);
+  height: var(--input-height);
+  border: var(--input-border);
+  border-radius: var(--input-border-radius);
+  line-height: 1.5 !important;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.select2-selection__rendered {
+  height: var(--input-height);
+  margin-top: var(--select2-margin-top);
+  margin-left: var(--select2-margin-x);
+  font-size: var(--input-font-size);
+  font-weight: var(--input-font-weight);
+  line-height: var(--input-line-height);
+  color: var(--input-font-color);
+}
+.select2-selection__arrow {
+  height: var(--input-height);
+  margin-top: var(--select2-margin-top);
+  margin-right: var(--select2-margin-x);
+}
+.select2-selection--single.form-error {
+  border: var(--input-border-error);
+}
+.select2[readonly] ~ .select2.select2-container {
+  pointer-events: none;
+}
+.select2[readonly] ~ .select2.select2-container .select2-selection--single {
+  background-color: #eeeeee;
+}
+/* ----------- */
+/* 4.2. Table  */
+/* ----------- */
+/* Datatable Custom Style */
+.dataTables_paginate > .pagination,
+.dataTables_info {
+  margin-top: 25px !important;
+}
+.dataTables_scrollHeadInner .table .dataTables_scrollBody {
+  width: 100%;
+}
+
+/* table head bold */
+.table thead tr th {
+  font-weight: 500;
+  /* color: var(--white);
+    background-color: var(--secondary); */
+}
+.table-container {
+  height: 150px;
+  max-height: 350px;
+  overflow: auto;
+}
+.table-container .table thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: var(--white);
+}
+.table td {
+  font-size: 13.5px;
+}
+td,
+th {
+  vertical-align: middle;
+}
+.table-container .table thead th {
+  vertical-align: top !important;
+}
+/* ------------------------ */
+/* 4.3. Form Layout Sizing  */
+/* ------------------------ */
+.form.row {
+  margin: 0.6em;
+  padding-left: 0.6em;
+  padding-right: 0.6em;
+}
+.form.row .form-group {
+  padding-left: 0.6em;
+  padding-right: 0.6em;
+}
+
+/* Login */
+.login-box {
+  width: 25%;
+}
+
+.full-width-table {
+  width: 100%;
+  border-collapse: collapse; /* Optional: To collapse table borders */
+}
+
+.full-width-table th,
+.full-width-table td {
+  padding: 8px; /* Optional: Adjust padding as needed */
+  border: 1px solid #ccc; /* Optional: Add borders or styling to table cells */
+}
+
+.full-width-table th {
+  background-color: #f2f2f2; /* Optional: Add background color to table header cells */
+}
+
+.dataTables_wrapper > .dataTables_scroll {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+/* index */
+.page-wrapper {
+  background: var(--bg) !important;
+  position: relative;
+}
+#navbarSupportedContent {
+  background: #f9fafb !important;
+}
+.navbar-nav > .nav-item.display:hover {
+  background-color: inherit !important;
+}
+.nav-item.display {
+  cursor: default !important;
+}
+.navbar-dark .navbar-nav .nav-link {
+  color: rgba(0, 0, 0, 0.8);
+}
+.navbar-dark .navbar-nav .nav-link:focus,
+.navbar-dark .navbar-nav .nav-link:hover {
+  color: rgb(0, 0, 0);
+}
+.navbar-dark .navbar-nav .nav-link.disabled {
+  color: rgba(255, 255, 255, 0.25);
+}
+.navbar-dark .navbar-nav .active > .nav-link,
+.navbar-dark .navbar-nav .nav-link.active,
+.navbar-dark .navbar-nav .nav-link.show,
+.navbar-dark .navbar-nav .show > .nav-link {
+  color: #fff;
+}
+#main-wrapper .topbar .top-navbar .navbar-header[data-logobg="skin5"] {
+  background: var(--primary);
+}
+#main-wrapper .topbar .navbar-collapse[data-navbarbg="skin5"],
+#main-wrapper .topbar[data-navbarbg="skin5"] {
+  background: var(--primary);
+}
+#main-wrapper .left-sidebar[data-sidebarbg="skin5"],
+#main-wrapper .left-sidebar[data-sidebarbg="skin5"] ul {
+  background: var(--primary);
+}
+#main-wrapper .left-sidebar[data-sidebarbg="skin5"] .create-btn,
+#main-wrapper .left-sidebar[data-sidebarbg="skin5"] ul .create-btn {
+  background: var(--active) !important;
+}
+.sidebar-nav ul .sidebar-item.selected > .sidebar-link {
+  background: var(--active);
+  opacity: 1;
+  color: white;
+}
+.sidebar-nav ul .sidebar-item.selected > .sidebar-link i {
+  background: var(--active);
+  opacity: 1;
+  color: white;
+}
+.sidebar-nav ul .sidebar-item .sidebar-link {
+  color: black;
+  padding: 12px;
+  border-radius: 4px;
+  background: white;
+  margin: 10px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  white-space: nowrap;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  line-height: 25px;
+  opacity: 0.85;
+}
+
+.sidebar-nav ul .sidebar-item .sidebar-link.active,
+.sidebar-nav ul .sidebar-item .sidebar-link:hover {
+  opacity: 1;
+}
+
+.sidebar-nav ul .sidebar-item .sidebar-link i {
+  font-style: normal;
+  width: 35px;
+  line-height: 25px;
+  font-size: 23px;
+  color: black;
+  display: inline-block;
+  text-align: center;
+}
+
+.sidebar-link {
+  font-size: 13.8px !important;
+}
+.sidebar-link i {
+  font-size: 20px !important;
+}
+
+/* btn logout */
+.sidebar-nav ul .sidebar-item .logout {
+  color: white;
+  padding: 12px;
+  border-radius: 4px;
+  background: var(--danger);
+  margin: 10px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  white-space: nowrap;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  line-height: 25px;
+  opacity: 0.85;
+}
+.sidebar-nav ul .sidebar-item .logout i {
+  font-style: normal;
+  width: 35px;
+  line-height: 25px;
+  font-size: 23px;
+  color: white;
+  display: inline-block;
+  text-align: center;
+}
+#main-wrapper.adjust {
+  height: 155vh;
+}
+.page-wrapper.adjust {
+  height: 145vh;
+}
+
+/* .card-header, .modal-header{
+    padding-top: 1.1em;
+    padding-bottom: 1.1em;
+}
+.card-header, .modal-header {
+    background-color: var(--header);
+    color: var(--white);
+} */
+
+/* .card-header {
+    padding-top: 1.1em;
+    padding-bottom: 1.1em;
+    background-color: inherit;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    color: var(--primary);
+} */
+
+.card,
+.modal-content {
+  border-radius: 14px !important;
+}
+
+.card-title,
+.modal-title {
+  font-size: 1.05rem;
+  font-weight: 300 !important;
+  color: rgba(0, 0, 0, 0.75) !important;
+  -webkit-text-stroke: 0.6px rgba(0, 0, 0, 0.75) !important;
+}
+
+.card-header,
+.modal-header {
+  padding-top: 1.3em;
+  padding-bottom: 1.1em;
+  border-top-left-radius: 12px !important;
+  border-top-right-radius: 12px !important;
+  background-color: var(--white);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12) !important;
+}
+
+.card-bar-menu {
+  padding-top: 0.6em;
+  padding-bottom: 0.6em;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  overflow: auto;
+}
+.card-bar-menu .btn-group {
+  margin-top: 0.3em;
+  margin-bottom: 0.3em;
+}
+.card-bar-menu .btn-group .btn {
+  padding-left: 1.5em;
+  padding-right: 1.5em;
+}
+
+.dataTables_wrapper .row .col-sm-12:has(.dataTables_scroll) {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.table thead tr th {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12) !important;
+  font-weight: 400 !important;
+  color: var(--input-font-color) !important;
+  -webkit-text-stroke: 0.3px var(--input-font-color);
+}
+.dataTables_scrollHeadInner table thead tr th {
+  border-bottom: none !important;
+}
+
+/* Shadow Properties */
+.card.form {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.card.card-hover {
+  box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+.card.card-hover:hover {
+  box-shadow: -5px 5px 6px rgba(0, 0, 0, 0.06) !important;
+}
+.card.card-hover,
+.card.card-hover .box {
+  background-color: var(--white);
+  border-radius: 1rem !important;
+}
+.card.card-hover .box {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Modals */
+.modal-md {
+  max-width: 900px;
+}
+.modal-xl {
+  max-width: 1200px;
+}
+.modal-load {
+  border-radius: 14px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  background-color: var(--white);
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  z-index: 2; /* Ensure it's above the form */
+}
+
+/* Custom form */
+
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 0.375rem 0.75rem;
+  /* font-size: 0.875rem; */
+  font-size: 1rem;
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #3e5569;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid var(--grey);
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 6px;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+/* @media */
+@media (max-width: 767px) {
+  .login-box {
+    width: 85%;
+  }
+}

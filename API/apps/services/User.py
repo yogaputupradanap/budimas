@@ -4,12 +4,54 @@ from  apps.widget  import  *
 from  sqlalchemy   import  desc
 from  .            import  Base
 from  apps.models  import  User, UserJabatan as Jabatan, Cabang
+from datetime import datetime
+from apps.query import DB
+from flask import request
 
 
 class UserService(Base) :
 
     def __init__(self) :
         super().__init__()
+
+    def userRequest(self, param):
+        return parseJson(self.request if self.request else request).jsonType(param)
+
+    # basic users CRUD
+    def getUser(self, id_user, role, roleData):
+        # 1. Ambil response lengkap
+        response = (
+            DB()
+            .setRawQuery(
+                """
+                SELECT users.*, cabang.nama as nama_cabang, jabatan.nama as nama_jabatan
+                FROM users 
+                LEFT JOIN cabang ON cabang.id = users.id_cabang 
+                LEFT JOIN jabatan ON jabatan.id = users.id_jabatan
+                WHERE users.id = :id                                     
+                """
+            )
+            .bindparams({"id": id_user})
+            .execute()
+            .fetchall()
+            .get()
+        )
+        
+        # 2. Ambil list dari 'result'
+        data_list = response.get('result', [])
+        
+        # 3. Cek apakah data ditemukan
+        if not data_list:
+            return {"status": "error", "message": "User tidak ditemukan"}, 404
+            
+        user = data_list[0]
+        
+        # 4. Logika role mapping
+        if not role and roleData: 
+            return user
+        
+        user[role] = roleData
+        return user
 
 
     @handle_error
@@ -71,6 +113,7 @@ class UserService(Base) :
                 .get()
         )
         
+
     
 
     

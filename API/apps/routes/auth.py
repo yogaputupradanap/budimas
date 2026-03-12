@@ -10,6 +10,7 @@ from apps.services.DMS import DMS
 from apps.services.Pajak import Auth as loginpajak
 from apps.services.Sales import Sales
 from apps.services.SalesCanvas import SalesCanvas
+from apps.services.Akuntasi import Auth as Loginpiutang
 # from apps.services.Akuntansi import BaseAkuntasi
 
 
@@ -50,6 +51,11 @@ def _701(): return DMS().getDmsUser()
 def _700(): 
      print("LOGIN ROUTE HIT")
      return loginakuntansi().login()
+
+@auth.route('/api/auth/login_piutang', methods=["POST"])
+def _704(): 
+     print("LOGIN ROUTE Piutang")
+     return Loginpiutang().login()
 
 @auth.route('/api/auth/pajak-login', methods=["POST"])
 def _702():   

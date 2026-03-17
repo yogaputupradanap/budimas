@@ -21,7 +21,7 @@ class kasbon_klaim(native_db.Model):
     
     # --- Relationships ---
     details = relationship("kasbon_klaim_detail", back_populates="kasbon_klaim_header", cascade="all, delete-orphan")
-    user_pengaju = relationship("users", foreign_keys=[id_user_pengaju])
-    user_approval = relationship("users", foreign_keys=[id_user_approval])
-    principal = relationship("principal", foreign_keys=[id_principal])
+    user_pengaju = relationship("User", foreign_keys=[id_user_pengaju])
+    user_approval = relationship("User", foreign_keys=[id_user_approval])
+    principal = relationship("Principal", foreign_keys=[id_principal])
 

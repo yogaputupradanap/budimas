@@ -66,3 +66,15 @@ from  .retur_request                import ReturRequest
 from  .retur_request_detail         import ReturRequestDetail
 from .prefix    import Prefix
 from .pajak import pajak
+from .voucher_2 import voucher_2
+from .voucher_3 import voucher_3
+from .klaim import klaim
+from .klaim_kategori import klaim_kategori
+from .kasbon_klaim import kasbon_klaim
+from .voucher_2_cabang import voucher_2_cabang
+from .voucher_3_cabang import voucher_3_cabang
+from .faktur import faktur
+from .kasbon_klaim_detail import kasbon_klaim_detail
+from .klaim_kategori import klaim_kategori
+from .stock_opname import stock_opname
+from .stock_opname_detail import stock_opname_detail

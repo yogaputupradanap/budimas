@@ -18,15 +18,15 @@ from apps.models import (
     klaim_kategori as KlaimKategori,
     kasbon_klaim as KasbonKlaim,
     kasbon_klaim_detail as KasbonKlaimDetail,
-    principal as Principal,
-    perusahaan as Perusahaan,
+    Principal as Principal,
+    Perusahaan as Perusahaan,
     sales_order as SalesOrder,
     sales_order_detail as SalesOrderDetail,
     faktur as Faktur,
-    plafon as Plafon,
-    customer as Customer,
-    cabang as Cabang,
-    produk as Produk
+    Plafon as Plafon,
+    Customer as Customer,
+    Cabang as Cabang,
+    Produk as Produk
 )
 
 class Promo(BaseServices):
@@ -523,7 +523,7 @@ class Promo(BaseServices):
                 users.password
             FROM users
             WHERE users.email = :email
-            AND users.id_jabatan IN (20)
+            AND users.id_jabatan IN (20, 2)
         """
         
         loginBindParam = {"email": email}

@@ -26,6 +26,8 @@ from apps.routes.customer import customer
 from apps.routes.finance import finance
 from apps.routes.sales_canvas import sales_canvas
 from apps.routes.akuntasi import akuntasi
+from apps.routes.promo import promo
+from apps.routes.stock_opname import stock_opname
 
 app = Flask(__name__)
 db = init_connection(app)
@@ -100,6 +102,8 @@ app.register_blueprint(customer)
 app.register_blueprint(finance)
 app.register_blueprint(sales_canvas)
 app.register_blueprint(akuntasi)
+app.register_blueprint(promo)
+app.register_blueprint(stock_opname)
 
 if __name__ == '__main__':
     # 1. Define the base directory of your project (Asumsi app.py ada di root project)

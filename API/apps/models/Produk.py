@@ -26,6 +26,7 @@ class Produk(BaseModel) :
     isiperkarton = BaseModel.integer()
     satuan = BaseModel.string(30)
     kubikasiperpieces = BaseModel.integer()
+    ppn = BaseModel.float()
     
     def __repr__(self)              :
         return f"data('{self.id}')"

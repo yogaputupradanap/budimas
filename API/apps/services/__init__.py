@@ -35,3 +35,8 @@ from .BaseServices import BaseServices
 from .Akuntansi import *
 from apps.models                import ReturRequest
 from .Pajak import *
+from .Promo import Promo
+from apps.models                import voucher_2
+from apps.models                import voucher_3
+from apps.models                import stock_opname
+from apps.models                import stock_opname_detail

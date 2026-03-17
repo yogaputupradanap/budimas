@@ -1,0 +1,389 @@
+<script setup>
+import FlexBox from "@/src/components/ui/FlexBox.vue";
+import SlideRightX from "@/src/components/animation/SlideRightX.vue";
+import Card from "@/src/components/ui/Card.vue";
+import Table from "@/src/components/ui/table/Table.vue";
+import Button from "@/src/components/ui/Button.vue";
+import Label from "@/src/components/ui/Label.vue";
+import SelectInput from "@/src/components/ui/formInput/SelectInput.vue";
+import { BFormInput } from "bootstrap-vue-next";
+import { AjukanUlangColumn } from "@/src/model/tableColumns/klaim-promo/list-klaim-ditolak/ajukan-ulang";
+import { ref, onMounted, computed, inject } from "vue";
+import { parseCurrency, simpleDateNow } from "@/src/lib/utils";
+import { useSorting } from "@/src/lib/useSorting";
+import { promoService } from "@/src/services/promo";
+import { useFiltering } from "@/src/lib/useFiltering";
+import { usePagination } from "@/src/lib/usePagination";
+import { useRoute, useRouter } from "vue-router";
+import { useTableSearch } from "@/src/lib/useTableSearch";
+
+const klaimId = computed(() => route.params.id);
+const selectedKategoriKlaim = ref(null);
+const klaimKategoriData = ref([]);
+const klaimDitolak = ref({});
+
+const inputValues = ref({ pph: 0 })
+const checkboxStates = ref({
+  dpp: false,
+  dppPlusPpn: true,
+  dppMinusPph: false,
+  dppPlusPpnMinusPph: false,
+})
+
+const route = useRoute();
+const router = useRouter();
+const $swal = inject("$swal");
+
+const { onSortingChange, sorting } = useSorting();
+const { onPaginationChange, pagination } = usePagination();
+const { onColumnFilterChange, globalFilters } = useFiltering();
+
+const isInputDisabled = computed(() => ({
+  dpp: !checkboxStates.value.dpp && !checkboxStates.value.dppPlusPpn && 
+        !checkboxStates.value.dppMinusPph && !checkboxStates.value.dppPlusPpnMinusPph,
+  ppn: !checkboxStates.value.dppPlusPpn && !checkboxStates.value.dppPlusPpnMinusPph,
+  pph: !checkboxStates.value.dppMinusPph && !checkboxStates.value.dppPlusPpnMinusPph,
+}))
+
+const totalCalculatedDPP = computed(() => {
+  return fakturList.value.reduce((sum, faktur) => sum + Number(faktur.calculated_dpp || 0), 0);
+});
+
+const totalCalculatedPPNValue = computed(() => {
+  return fakturList.value.reduce((sum, faktur) => sum + Number(faktur.calculated_ppn_value || 0), 0);
+});
+
+const totalEstimasiKlaim = computed(() => {
+  return fakturList.value.reduce((sum, faktur) => sum + Number(faktur.estimasi_klaim || 0), 0);
+});
+
+const averagePPNPercent = computed(() => {
+  if (fakturList.value.length === 0) return 0;
+  const totalPercent = fakturList.value.reduce(
+    (sum, faktur) => sum + Number(faktur.ppn || 0), 0);
+  return (totalPercent / fakturList.value.length).toFixed(1);
+});
+
+const formattedTotalEstimasiKlaim = computed(() => parseCurrency(totalEstimasiKlaim.value));
+const formattedTotal = computed(() => parseCurrency(totalCalculation.value));
+
+const totalCalculation = computed(() => {
+  const dppNum = Number(totalCalculatedDPP.value);
+  const ppnNum = Number(totalCalculatedPPNValue.value);
+  const pphNum = Number(inputValues.value.pph);
+
+  if (checkboxStates.value.dpp) return dppNum;
+  if (checkboxStates.value.dppPlusPpn) return dppNum + ppnNum;
+  if (checkboxStates.value.dppMinusPph) return dppNum - pphNum;
+  if (checkboxStates.value.dppPlusPpnMinusPph) return dppNum + ppnNum - pphNum;
+  
+  return 0;
+});
+
+const { endpoints } = promoService;
+
+const fieldPool = [klaimId];
+const queryEntries = computed(() => [
+  ["id=", klaimId.value]
+]);
+
+const options = {
+  initialColumnName: "no_faktur",
+  checkFieldFilterFunc: (val) => val[1] === undefined || val[1] === null,
+  filterFunction: (val) => val[1] !== undefined && val[1] !== null,
+  asArgument: true,
+};
+
+const [
+  klaimData,
+  ,
+  klaimLoading,
+  isServerTable,
+  klaimKey,
+  searchQuery,
+] = useTableSearch(endpoints.promoListFaktur, fieldPool, queryEntries, options);
+
+const fakturList = computed(() => {
+  const arr = Array.isArray(klaimData.value?.pages) ? klaimData.value.pages : [];
+  return arr;
+});
+
+const fetchKlaimDetail = async () => {
+  if (!klaimId.value) {
+    $swal.error("ID klaim tidak ditemukan!");
+    return;
+  }
+
+  try {
+    const response = await promoService.getKlaimDetail(klaimId.value, 3);
+    klaimDitolak.value = response;
+  } catch (error) {
+    console.error("Error fetching klaim details:", error);  
+    klaimDitolak.value = {};
+  }
+};
+
+const fetchKlaimKategori = async () => {
+  try {
+    const response = await promoService.getKlaimKategori();
+    klaimKategoriData.value = response;
+  } catch (error) {
+    console.error("Error fetching klaim kategori:", error);
+  }
+}
+
+const handleCheckboxChange = (checkboxName, event) => {
+  Object.keys(checkboxStates.value).forEach(key => {
+    checkboxStates.value[key] = false; 
+  });
+  checkboxStates.value[checkboxName] = event;
+}
+
+const validateForm = () => {
+  if (!selectedKategoriKlaim.value) {
+    $swal.error("Kategori Klaim harus dipilih");
+    return false;
+  }
+  if (fakturList.value.length === 0) {
+    $swal.error("Tidak ada data faktur untuk diajukan klaimnya");
+    return false;
+  }
+  return true;
+}
+
+const handleAjukanUlangKlaim = async () => {
+  if (!validateForm()) return;
+  const draftVoucherIds = fakturList.value.map(faktur => faktur.id);
+
+  try {
+    const payload = {
+      dpp: totalCalculatedDPP.value,
+      ppn: totalCalculatedPPNValue.value,
+      pph: Number(inputValues.value.pph),
+      total_dpp: totalCalculatedDPP.value,
+      total_pph: Number(inputValues.value.pph),
+      total_ppn: totalCalculatedPPNValue.value,
+      total_klaim_diajukan: totalCalculation.value,
+      id_kategori_klaim: selectedKategoriKlaim.value,
+      tanggal_pengajuan_klaim: simpleDateNow(),
+      id_draft_voucher: draftVoucherIds,
+      klaim_id: Number(klaimId.value),
+      status_klaim: 1
+    };
+    
+    await promoService.ajukanUlangKlaimData(payload);
+    $swal.success("Berhasil Mengajukan Ulang Klaim!");
+    setTimeout(() => router.replace({ name: "List Klaim Promo" }), 1000);
+  } catch (error) {
+    console.error("Error post ajukan klaim:", error);
+    throw error;
+  }
+}
+
+onMounted(async () => {
+  fetchKlaimDetail();
+  fetchKlaimKategori();
+  if (klaimId.value) await searchQuery();
+})
+</script>
+
+<template>
+  <FlexBox full flex-col>
+    <SlideRightX
+      class="slide-container tw-z-10"
+      :duration-enter="0.6"
+      :duration-leave="0.6"
+      :delay-in="0.1"
+      :delay-out="0.1"
+      :initial-x="-40"
+      :x="40"
+    >
+      <Card no-subheader>
+        <template #header>Ajukan Klaim</template>
+        <template #content>
+          <div
+            full
+            class="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-3 gap-4 tw-w-full tw-px-2"
+          >
+            <Label label="Tanggal">
+              <BFormInput
+                :model-value="simpleDateNow(klaimDitolak?.tanggal_pengajuan_klaim)"
+                disabled
+                placeholder="Tanggal"
+              />
+            </Label>
+            <Label label="No Klaim">
+              <BFormInput
+                :model-value="klaimDitolak?.nomor_klaim"
+                disabled
+                placeholder="No Klaim"
+              />
+            </Label>
+            <Label label="Principal">
+              <BFormInput
+                :model-value="klaimDitolak?.principal"
+                disabled
+                placeholder="Principal"
+              />
+            </Label>
+            <Label label="Kode Promo">
+              <BFormInput
+                :model-value="klaimDitolak?.kode_promo"
+                disabled
+                placeholder="Kode Promo"
+              />
+            </Label>
+            <Label label="Nama Promo">
+              <BFormInput
+                :model-value="klaimDitolak?.nama_promo"
+                disabled
+                placeholder="Nama Promo"
+              />
+            </Label>
+            <Label label="Total Klaim">
+              <BFormInput
+                :model-value="formattedTotalEstimasiKlaim"
+                placeholder="Total klaim"
+                disabled
+              />
+            </Label>
+          </div>
+        </template>
+      </Card>
+    </SlideRightX>
+  </FlexBox>
+  <FlexBox full flex-col>
+    <SlideRightX
+      class="slide-container"
+      :duration-enter="0.6"
+      :duration-leave="0.6"
+      :delay-in="0.1"
+      :delay-out="0.1"
+      :initial-x="-40"
+      :x="40"
+    >
+      <Card no-subheader>
+        <template #header>List Faktur</template>
+        <template #content>
+          <ServerTable
+            v-if="isServerTable"
+            table-width="tw-w-full"
+            :columns="AjukanUlangColumn"
+            :key="klaimKey"
+            :table-data="fakturList"
+            :loading="klaimLoading"
+            :on-pagination-change="onPaginationChange"
+            :on-global-filters-change="onColumnFilterChange"
+            :on-sorting-change="onSortingChange"
+            :pagination="pagination"
+            :sorting="sorting"
+            :filter="globalFilters"
+            :page-count="totalPage"
+            :total-data="count"
+          />
+          <Table
+            v-else
+            :key="`table-${klaimKey}`"
+            :columns="AjukanUlangColumn"
+            :table-data="klaimData?.pages || []"
+          />
+          <div class="tw-flex tw-flex-col tw-gap-4 tw-w-full tw-px-2">
+            <div class="tw-border-b tw-border-t">
+              <div class="tw-grid tw-grid-cols-4 tw-max-w-2xl tw-mx-auto tw-py-4">
+                <BFormCheckbox
+                  :model-value="checkboxStates.dpp"
+                  name="dpp"
+                  class="tw-text-sm"
+                  @update:model-value="(val) => handleCheckboxChange('dpp', val)"
+                >
+                  DPP
+                </BFormCheckbox>
+                <BFormCheckbox
+                  :model-value="checkboxStates.dppPlusPpn"
+                  name="dppPlusPpn"
+                  class="tw-text-sm"
+                  @update:model-value="(val) => handleCheckboxChange('dppPlusPpn', val)"
+                >
+                  DPP + PPN
+                </BFormCheckbox>
+                <BFormCheckbox
+                  :model-value="checkboxStates.dppMinusPph"
+                  name="dppMinusPph"
+                  class="tw-text-sm"
+                  @update:model-value="(val) => handleCheckboxChange('dppMinusPph', val)"
+                >
+                  DPP - PPH
+                </BFormCheckbox>
+                <BFormCheckbox
+                  :model-value="checkboxStates.dppPlusPpnMinusPph"
+                  name="dppPlusPpnMinusPph"
+                  class="tw-text-sm"
+                  @update:model-value="(val) => handleCheckboxChange('dppPlusPpnMinusPph', val)"
+                >
+                  DPP + PPN - PPH
+                </BFormCheckbox>
+              </div>
+            </div>
+            <div class="tw-grid tw-grid-cols-3 tw-gap-4">
+              <Label label="DPP">
+                <BFormInput 
+                  placeholder="Nominal DPP" 
+                  readonly
+                  :model-value="parseCurrency(totalCalculatedDPP)"
+                  :class="{ 'tw-bg-gray-200': isInputDisabled.dpp }"
+                  />
+              </Label>
+              <Label :label="`PPN (${averagePPNPercent}%)`">
+                <BFormInput 
+                  placeholder="Nominal PPN" 
+                  readonly
+                  :model-value="parseCurrency(totalCalculatedPPNValue)"
+                  :class="{ 'tw-bg-gray-200': isInputDisabled.ppn }"
+                  />
+              </Label>
+              <Label label="PPh">
+                <BFormInput 
+                  placeholder="Nominal PPh" 
+                  type="number" 
+                  v-model="inputValues.pph"
+                  :disabled="isInputDisabled.pph"
+                  :class="{ 'tw-bg-gray-200': isInputDisabled.pph }"
+                  />
+              </Label>
+            </div>
+             <div class="tw-grid tw-grid-cols-3 tw-gap-4">
+              <Label label="Kategori Klaim">
+                <SelectInput
+                  placeholder="Pilih Data"
+                  size="md"
+                  class="tw-border-neutral-300"
+                  :search="true"
+                  :options="klaimKategoriData"
+                  text-field="nama"
+                  value-field="id"
+                  v-model="selectedKategoriKlaim"
+                />
+              </Label>
+              <Label label="Total">
+                <BFormInput
+                  :model-value="formattedTotal"
+                  disabled
+                  placeholder="Total"
+                />
+              </Label>
+            </div>
+          </div>
+          <FlexBox full jus-end>
+            <Button
+              icon="mdi mdi-check"
+              class="tw-bg-green-500 tw-px-4 tw-h-[34px]"
+              :trigger="handleAjukanUlangKlaim"
+              >
+              Ajukan Klaim
+              </Button>
+          </FlexBox>
+        </template>
+      </Card>
+    </SlideRightX>
+  </FlexBox>
+</template>

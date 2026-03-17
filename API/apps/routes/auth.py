@@ -11,6 +11,9 @@ from apps.services.Pajak import Auth as loginpajak
 from apps.services.Sales import Sales
 from apps.services.SalesCanvas import SalesCanvas
 from apps.services.Akuntasi import Auth as Loginpiutang
+from apps.services.Promo import Promo
+from apps.services.StockOpname import  StockOpname
+
 # from apps.services.Akuntansi import BaseAkuntasi
 
 
@@ -41,7 +44,7 @@ def _31(): return StockTransfer().get_stock_transfer_info()
 @auth.route('/api/auth/master-voucher/login', methods=["POST"])
 def _41(): return Voucher().getMasterVoucherUser()
 
-@auth.route('/klaim-promo/login', methods=["POST"])
+@auth.route('/api/auth/klaim-promo/login', methods=["POST"])
 def _51(): return Promo().getPromoUser()
 
 @auth.route('/api/auth/dms/login', methods=["POST"])
@@ -63,3 +66,6 @@ def _702():
 
 @auth.route('/api/auth/sales-canvas/login', methods=["POST"])
 def _703(): return SalesCanvas().get_token_by_credential()
+
+@auth.route('/api/auth/stock-opname/login', methods=["POST"])
+def _705(): return StockOpname().getStockOpnameUser()
